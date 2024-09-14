@@ -1,0 +1,11 @@
+:host {
+  display: block;
+  border: 1px solid grey;
+  min-width: 80px;
+  min-height: 20px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  &.focus {
+    background: red;
+  }
+}

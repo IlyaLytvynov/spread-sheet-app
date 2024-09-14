@@ -1,0 +1,16 @@
+{
+  "name": "tables",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "client:dev": "yarn workspace angular-client-app start",
+    "ng-cli": "yarn workspace angular-client-app ng"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
