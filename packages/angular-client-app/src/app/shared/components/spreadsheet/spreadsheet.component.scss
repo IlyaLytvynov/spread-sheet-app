@@ -1,5 +1,40 @@
-.row {
-  display: flex;
-  justify-content: start;
-  border: 1px solid green;
+:host {
+  --leftBarWidth: 30px;
+  --topBarHeight: 30px;
+  position: relative;
+  display: block;
+
+  .row {
+  }
+
+  .leftbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--leftBarWidth);
+  }
+
+  .topbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-wrap: nowrap;
+    padding-left: var(--leftBarWidth);
+    background-color: green;
+  }
+
+  .column {
+    height: auto;
+  }
+
+  .content {
+    position: relative;
+    margin-left: var(--leftBarWidth);
+    padding-top: var(--topBarHeight);
+    width: auto;
+    height: auto;
+    border: 1px solid red;
+    display: block;
+  }
 }

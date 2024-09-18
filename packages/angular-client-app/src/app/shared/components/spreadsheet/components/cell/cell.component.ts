@@ -32,9 +32,19 @@ const checkUpdates = (currentValue: any, previous: any) => {
 })
 export class CellComponent implements OnChanges {
   @Input() cell: IUICell | undefined;
+  @Input() width: number | undefined;
+  @Input() height: number | undefined;
 
   @HostBinding('class.focus') get focus() {
     return this.cell?.isFocus;
+  }
+
+  @HostBinding('style.width') get hostWidth() {
+    return `${this.width}px`
+  }
+
+  @HostBinding('style.height') get hostHeight() {
+    return `${this.height}px`
   }
 
   constructor(private cdRef: ChangeDetectorRef) {}
@@ -47,6 +57,5 @@ export class CellComponent implements OnChanges {
     // this.cdRef.detach();
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-  }
+  ngOnChanges(changes: SimpleChanges): void {}
 }

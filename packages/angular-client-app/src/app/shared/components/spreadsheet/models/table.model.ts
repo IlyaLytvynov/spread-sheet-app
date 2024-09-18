@@ -1,31 +1,40 @@
-import { TableLayout } from "../types";
-import { Cell } from "./cell";
+import { TableLayout } from '../types';
+import { Cell } from './cell.model';
 
-const cells = 'ABCDEFJKLMNOPQRSTUVWXYZ';
-
+const columns = 'ABCDEFJKLMNOPQRSTUVWXYZ';
+const columnsIterableb = columns.split('');
 export class Table {
+  state = {
+    activeColumnsIndexes: [],
+    activeRowIndexes: [],
+  }
+
   layout: TableLayout;
+
+  static get columns() {
+    return columnsIterableb;
+  }
 
   constructor(layout: TableLayout = []) {
     this.layout = layout;
   }
 
   static generateLayout({
-    r,
-    c = cells.length,
+    rows,
+    // columns = cells.length,
     data = {},
   }: {
-    r: number;
-    c?: number;
+    rows: number;
+    columns?: number;
     data?: Record<string, string>;
   }): Table {
     const layout: TableLayout = [];
-    for (let i = 1; i < r; i++) {
+    for (let rowIndex = 1; rowIndex < rows; rowIndex++) {
       const row: Cell[] = [];
-      for (let j = 0; j < c; j++) {
-        const key = cells[j] + i;
+      for (let j = 0; j < columns.length; j++) {
+        const key = columns[j] + rowIndex;
         // This prevent from redundant re renders of cells
-        const cell = new Cell(data[key], false, false);
+        const cell = new Cell(data[key], columns[j], rowIndex.toString(), false, false);
         row.push(cell);
       }
       layout.push(row);
@@ -43,5 +52,9 @@ export class Table {
       return row;
     });
     return this;
+  }
+
+  enableFocus() {
+
   }
 }

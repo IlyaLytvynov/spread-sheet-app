@@ -1,6 +1,8 @@
 :host {
+  box-sizing: border-box;
   display: block;
-  border: 1px solid grey;
+  border-right: 1px solid grey;
+  border-bottom: 1px solid grey;
   min-width: 80px;
   min-height: 20px;
   flex-grow: 0;
