@@ -1,60 +1,109 @@
-import { TableLayout } from '../types';
+import { IUICell, TableLayout } from '../types';
 import { Cell } from './cell.model';
 
-const columns = 'ABCDEFJKLMNOPQRSTUVWXYZ';
-const columnsIterableb = columns.split('');
+export const COLUMNS = 'ABCDEFJKLMNOPQRSTUVWXYZ';
+export const DEFAULT_ROW_COUMTS = 100;
+
 export class Table {
-  state = {
-    activeColumnsIndexes: [],
-    activeRowIndexes: [],
-  }
-
-  layout: TableLayout;
-
-  static get columns() {
-    return columnsIterableb;
-  }
-
-  constructor(layout: TableLayout = []) {
-    this.layout = layout;
-  }
-
-  static generateLayout({
-    rows,
-    // columns = cells.length,
+  static initializeTableLayout({
+    rowsCount = DEFAULT_ROW_COUMTS,
+    columnsCount = COLUMNS.length,
     data = {},
   }: {
-    rows: number;
-    columns?: number;
+    rowsCount?: number;
+    columnsCount?: number;
     data?: Record<string, string>;
   }): Table {
     const layout: TableLayout = [];
-    for (let rowIndex = 1; rowIndex < rows; rowIndex++) {
+    let columns = COLUMNS.slice(0, columnsCount).split(''); // need to set columns for ui, for example A-D, by default A-Z
+
+    for (let rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
       const row: Cell[] = [];
-      for (let j = 0; j < columns.length; j++) {
-        const key = columns[j] + rowIndex;
+      for (let j = 0; j < columnsCount; j++) {
+        const key = COLUMNS[j] + rowIndex;
         // This prevent from redundant re renders of cells
-        const cell = new Cell(data[key], columns[j], rowIndex.toString(), false, false);
+        const cell = new Cell(data[key], COLUMNS[j], rowIndex, false);
         row.push(cell);
       }
       layout.push(row);
     }
-    return new Table(layout);
+    return new Table(layout, columns, rowsCount);
   }
 
-  toggleFocusColumn(cellIndices: number[] | number): Table {
-    const indices = Array.isArray(cellIndices) ? cellIndices : [cellIndices];
-    this.layout = this.layout.map((row) => {
-      indices.forEach((cellIndex) => {
-        const newInstance = Cell.fromExisting(row[cellIndex]);
-        row[cellIndex] = newInstance.focus();
-      });
-      return row;
+  state = {
+    activeColumnsIndexes: [],
+    activeRowIndexes: [],
+  };
+
+  constructor(
+    public layout: TableLayout = [],
+    public readonly columns: string[],
+    public readonly rowsCount: number
+  ) {}
+
+  selectColumn(columnIndices: number[] | number): Table {
+    const indices = Array.isArray(columnIndices)
+      ? columnIndices
+      : [columnIndices];
+    const cellsToPerfomAction = this.layout.reduce(
+      (arr, row) => [...arr, ...indices.map((index) => row[index])],
+      []
+    );
+
+    cellsToPerfomAction.forEach((cell) => {
+      this.selectCell(cell);
     });
     return this;
   }
 
-  enableFocus() {
+  selectRow(rowIndecies: number[] | number) {
+    const indices = Array.isArray(rowIndecies) ? rowIndecies : [rowIndecies];
 
+    const cellsToPerfomAction = indices.reduce(
+      (arr, index) => [...arr, ...this.layout[index]],
+      [] as IUICell[]
+    );
+
+    cellsToPerfomAction.forEach((cell) => {
+      this.selectCell(cell);
+    });
+    return this;
+  }
+
+  selectCell(cell: IUICell): Table {
+    this.layout = this.performeAction(this.layout, cell, (cell: IUICell) =>
+      cell.focus()
+    );
+    return this;
+  }
+
+  blurCell(cell: IUICell): Table {
+    this.layout = this.performeAction(this.layout, cell, (cell: IUICell) =>
+      cell.blur()
+    );
+    return this;
+  }
+
+  private performeAction(
+    layout: TableLayout,
+    cell: IUICell,
+    action: (cell: IUICell) => IUICell
+  ) {
+    const newLayout = [...layout];
+    const { columnIndex, rowIndex } = cell;
+    const newCell = action(cell);
+
+    const row = Number(rowIndex);
+    const column = this.columns.indexOf(columnIndex); // ColumnIndex is an letter A...XY we need to convert it to index in a row
+    if (
+      column === undefined ||
+      column === -1 ||
+      row === undefined ||
+      isNaN(row)
+    ) {
+      throw new Error(`Column or row is undefined for ${cell}`);
+    }
+    newLayout[row][column] = newCell;
+    return newLayout;
   }
 }

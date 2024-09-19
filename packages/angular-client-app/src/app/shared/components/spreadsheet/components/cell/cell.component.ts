@@ -36,17 +36,17 @@ export class CellComponent implements OnChanges {
   @Input() height: number | undefined;
 
   @HostBinding('class.focus') get focus() {
-    return this.cell?.isFocus;
+    return this.cell?.hasFocus;
   }
 
   @HostBinding('style.width') get hostWidth() {
-    return `${this.width}px`
+    return `${this.width}px`;
   }
 
   @HostBinding('style.height') get hostHeight() {
-    return `${this.height}px`
+    return `${this.height}px`;
   }
-
+  test = 0;
   constructor(private cdRef: ChangeDetectorRef) {}
 
   get random() {

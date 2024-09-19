@@ -1,25 +1,29 @@
 import { IUICell } from '../types';
 
 export class Cell implements IUICell {
-  static fromExisting({
+  static cloneCell({
     value,
     columnIndex,
     rowIndex,
-    isActive,
-    isFocus,
+    hasFocus,
   }: IUICell) {
-    return new Cell(value, columnIndex, rowIndex, isActive, isFocus);
+    return new Cell(value, columnIndex, rowIndex, hasFocus);
   }
   constructor(
     public value: string = '',
     public columnIndex: string, //'ABC'
-    public rowIndex: string, // 1-999
-    public isActive: boolean,
-    public isFocus: boolean
+    public rowIndex: number, // 0-999
+    public hasFocus: boolean
   ) {}
 
+
   focus() {
-    this.isFocus = true;
-    return this;
+    this.hasFocus = true;
+    return Cell.cloneCell(this);
+  }
+
+  blur() {
+    this.hasFocus = false;
+    return Cell.cloneCell(this);
   }
 }

@@ -9,7 +9,7 @@ import { RowComponent } from './components/row/row.component';
 import { CellComponent } from './components/cell/cell.component';
 import { CommonModule } from '@angular/common';
 import { Table } from './models/table.model';
-import { SpreadSheetData } from './types';
+import { IUICell, SpreadSheetData } from './types';
 
 @Component({
   selector: 'app-spreadsheet',
@@ -19,8 +19,9 @@ import { SpreadSheetData } from './types';
     <div class="topbar" [style.min-height.px]="columnTitleHeight">
       <div
         class="column"
+        *ngFor="let column of columns; let i = index"
         [style.min-width.px]="columnDefaultWidth"
-        *ngFor="let column of columns"
+        (click)="selectColumn(i)"
       >
         {{ column }}
       </div>
@@ -29,7 +30,8 @@ import { SpreadSheetData } from './types';
       <div
         class="row"
         *ngFor="let row of table?.layout; let i = index"
-        [style.height.px]="i !== 0 ? rowDefaultHeight : columnTitleHeight"
+        (click)="selectRow(i)"
+        [style.height.px]="rowDefaultHeight"
       >
         {{ i }}
       </div>
@@ -39,7 +41,7 @@ import { SpreadSheetData } from './types';
         <app-table-cell
           *ngFor="let cell of row; let cellIndex = index"
           [cell]="cell"
-          (click)="selectCell(cellIndex)"
+          (click)="selectCell(cell)"
           [width]="columnDefaultWidth"
           [height]="rowDefaultHeight"
         >
@@ -53,8 +55,8 @@ import { SpreadSheetData } from './types';
 export class SpreadsheetComponent {
   @Input() spreadSheet: SpreadSheetData = {};
 
-  table = Table.generateLayout({
-    rows: 50,
+  table = Table.initializeTableLayout({
+    rowsCount: 10,
     data: {
       A1: '1',
       B1: '3',
@@ -64,16 +66,24 @@ export class SpreadsheetComponent {
   columnDefaultWidth = 100;
   rowDefaultHeight = 40;
   columnTitleHeight = 30;
+
   constructor(private cDRef: ChangeDetectorRef) {}
 
   get columns() {
-    console.log(Table.columns);
-    return Table.columns;
+    return this.table.columns;
   }
 
   ngOnInit() {}
 
-  selectCell(index: number) {
-    this.table = this.table.toggleFocusColumn([index]);
+  selectColumn(index: number) {
+    this.table = this.table.selectColumn([index]);
+  }
+
+  selectCell(cell: IUICell) {
+    this.table = this.table.selectCell(cell);
+  }
+
+  selectRow(index: number) {
+    this.table = this.table.selectRow([index]);
   }
 }
