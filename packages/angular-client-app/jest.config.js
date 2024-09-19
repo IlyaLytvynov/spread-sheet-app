@@ -1,26 +1,14 @@
 module.exports = {
-  preset: 'jest-preset-angular',
-  setupFilesAfterEnv: ['<rootDir>/setup-jest.ts'],
-  testPathIgnorePatterns: [
-    "<rootDir>/node_modules/",
-    "<rootDir>/dist/",
-    "<rootDir>/src/test.ts"
-  ],
+  preset: "jest-preset-angular",
+  setupFilesAfterEnv: ["<rootDir>/setup-jest.ts"],
+  globalSetup: "jest-preset-angular/global-setup",
+  moduleNameMapper: {
+    // "@services/(.*)": "<rootDir>/src/app/shared/services/$1",
+    "@core/(.*)": "<rootDir>/src/app/core/$1",
+  },
   globals: {
     'ts-jest': {
-      tsconfig: '<rootDir>/tsconfig.spec.json',
-      stringifyContentPathRegex: '\\.html$',
-      astTransformers: {
-        before: [
-          'jest-preset-angular/build/InlineFilesTransformer',
-          'jest-preset-angular/build/StripStylesTransformer'
-        ]
-      }
+      tsConfig: 'tsconfig.spec.json'
     }
-  },
-  transform: {
-    '^.+\\.(ts|js|html)$': 'ts-jest'
-  },
-  moduleFileExtensions: ['ts', 'html', 'js', 'json'],
-  coverageReporters: ['html']
+  }
 };
