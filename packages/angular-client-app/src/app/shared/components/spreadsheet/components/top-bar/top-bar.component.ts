@@ -29,11 +29,6 @@ export class TopBarComponent {
   @Input() height: number | undefined;
 
   @Output() select: EventEmitter<number> = new EventEmitter();
-
-  @HostBinding('style.height') get hostHeight() {
-    return `${this.height}px`;
-  }
-
   onSelect(i: number) {
     this.select.emit(i);
   }

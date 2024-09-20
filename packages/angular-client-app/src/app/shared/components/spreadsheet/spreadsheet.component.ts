@@ -2,7 +2,9 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  ElementRef,
   Input,
+  Renderer2,
 } from '@angular/core';
 import { RootComponent } from './components/root/root.component';
 import { RowComponent } from './components/row/row.component';
@@ -12,6 +14,9 @@ import { Table } from './models/table.model';
 import { IUICell, SpreadSheetData } from './types';
 import { TopBarComponent } from './components/top-bar/top-bar.component';
 import { LeftBarComponent } from './components/left-bar/left-bar.component';
+
+const LEFT_BAR_WIDTH_CSS_VAR = '--spreadSheetLeftBarWidth';
+const TOP_BAR_HEIGHT_CSS_VAR = '--spreadSheetTopBarHeight';
 
 @Component({
   selector: 'app-spreadsheet',
@@ -68,7 +73,14 @@ export class SpreadsheetComponent {
   rowDefaultHeight = 40;
   columnTitleHeight = 30;
 
-  constructor(private cDRef: ChangeDetectorRef) {}
+  constructor(
+    private cDRef: ChangeDetectorRef,
+    private renderer: Renderer2,
+    private elRef: ElementRef
+  ) {
+    //@ts-ignore
+    window.spreadsheet = this;
+  }
 
   get columns() {
     return this.table.columns;
@@ -86,5 +98,17 @@ export class SpreadsheetComponent {
 
   selectRow(index: number) {
     this.table = this.table.selectRow([index]);
+  }
+
+  resizeLeftBarWidth(size: number) {
+    this.updateCSSVariable(LEFT_BAR_WIDTH_CSS_VAR, `${size}px`);
+  }
+
+  resizeTopBarHeight(size: number) {
+    this.updateCSSVariable(TOP_BAR_HEIGHT_CSS_VAR, `${size}px`);
+  }
+
+  updateCSSVariable(variable: string, value: string) {
+    this.elRef.nativeElement.style.setProperty(variable, value);
   }
 }

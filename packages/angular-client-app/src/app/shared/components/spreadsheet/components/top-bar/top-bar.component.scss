@@ -7,4 +7,6 @@
   flex-wrap: nowrap;
   padding-left: var(--spreadSheetLeftBarWidth);
   background-color: green;
+  height: var(--spreadSheetTopBarHeight);
+  align-items: stretch;
 }
