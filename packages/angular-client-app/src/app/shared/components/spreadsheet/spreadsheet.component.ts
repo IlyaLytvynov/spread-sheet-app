@@ -10,32 +10,32 @@ import { CellComponent } from './components/cell/cell.component';
 import { CommonModule } from '@angular/common';
 import { Table } from './models/table.model';
 import { IUICell, SpreadSheetData } from './types';
+import { TopBarComponent } from './components/top-bar/top-bar.component';
+import { LeftBarComponent } from './components/left-bar/left-bar.component';
 
 @Component({
   selector: 'app-spreadsheet',
   standalone: true,
-  imports: [CommonModule, RootComponent, RowComponent, CellComponent],
+  imports: [
+    CommonModule,
+    RootComponent,
+    RowComponent,
+    CellComponent,
+    TopBarComponent,
+    LeftBarComponent,
+  ],
   template: `
-    <div class="topbar" [style.min-height.px]="columnTitleHeight">
-      <div
-        class="column"
-        *ngFor="let column of columns; let i = index"
-        [style.min-width.px]="columnDefaultWidth"
-        (click)="selectColumn(i)"
-      >
-        {{ column }}
-      </div>
-    </div>
-    <div class="leftbar">
-      <div
-        class="row"
-        *ngFor="let row of table?.layout; let i = index"
-        (click)="selectRow(i)"
-        [style.height.px]="rowDefaultHeight"
-      >
-        {{ i }}
-      </div>
-    </div>
+    <app-spreadsheet-top-bar
+      [columns]="columns"
+      [height]="columnTitleHeight"
+      [columnWidth]="columnDefaultWidth"
+      (select)="selectColumn($event)"
+    ></app-spreadsheet-top-bar>
+    <app-spreadsheet-left-bar
+      [rowsCount]="table.rowsCount"
+      [height]="rowDefaultHeight"
+      (select)="selectRow($event)"
+    ></app-spreadsheet-left-bar>
     <div class="content">
       <app-table-row *ngFor="let row of table?.layout; let rowIndex = index">
         <app-table-cell
@@ -57,6 +57,7 @@ export class SpreadsheetComponent {
 
   table = Table.initializeTableLayout({
     rowsCount: 10,
+    columnsCount: 10,
     data: {
       A1: '1',
       B1: '3',

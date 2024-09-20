@@ -1,0 +1,11 @@
+:host {
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  padding-top: var(--spreadSheetTopBarHeight);
+  left: 0;
+  width: var(--spreadSheetLeftBarWidth);
+  > * {
+    border: 1px solid blue;
+  }
+}

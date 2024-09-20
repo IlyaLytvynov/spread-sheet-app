@@ -33,6 +33,8 @@ export class Table {
   state = {
     activeColumnsIndexes: [],
     activeRowIndexes: [],
+    selectedColumnIndecies: [],
+    selectedRowsIndecies: []
   };
 
   constructor(

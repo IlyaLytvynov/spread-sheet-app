@@ -1,36 +1,12 @@
 :host {
-  --leftBarWidth: 30px;
-  --topBarHeight: 30px;
+  --spreadSheetLeftBarWidth: 30px;
+  --spreadSheetTopBarHeight: 30px;
+
   position: relative;
   display: block;
   box-sizing: border-box;
   > * {
     box-sizing: border-box;
-  }
-  .row {
-  }
-
-  .leftbar {
-    z-index: 1;
-    position: absolute;
-    top: 0;
-    padding-top: var(--topBarHeight);
-    left: 0;
-    width: var(--leftBarWidth);
-    > * {
-      border: 1px solid blue;
-    }
-  }
-
-  .topbar {
-    z-index: 1;
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: flex;
-    flex-wrap: nowrap;
-    padding-left: var(--leftBarWidth);
-    background-color: green;
   }
 
   .column {
@@ -39,8 +15,8 @@
 
   .content {
     position: relative;
-    margin-left: var(--leftBarWidth);
-    padding-top: var(--topBarHeight);
+    margin-left: var(--spreadSheetLeftBarWidth);
+    padding-top: var(--spreadSheetTopBarHeight);
     width: auto;
     height: auto;
     display: block;
