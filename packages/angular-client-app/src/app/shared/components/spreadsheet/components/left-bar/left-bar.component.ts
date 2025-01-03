@@ -10,11 +10,10 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-spreadsheet-left-bar',
-  standalone: true,
-  imports: [CommonModule, DragDropModule],
-  encapsulation: ViewEncapsulation.Emulated,
-  template: `
+    selector: 'app-spreadsheet-left-bar',
+    imports: [CommonModule, DragDropModule],
+    encapsulation: ViewEncapsulation.Emulated,
+    template: `
     <div
       class="row"
       *ngFor="let row of rows; let i = index"
@@ -32,7 +31,7 @@ import { CommonModule } from '@angular/common';
       ></span>
     </div>
   `,
-  styleUrl: './left-bar.component.scss',
+    styleUrl: './left-bar.component.scss'
 })
 export class LeftBarComponent {
   @Input() height: number | undefined;

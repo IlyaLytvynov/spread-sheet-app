@@ -23,12 +23,11 @@ const checkUpdates = (currentValue: any, previous: any) => {
 };
 
 @Component({
-  selector: 'app-table-cell',
-  standalone: true,
-  imports: [CommonModule],
-  template: `{{ cell?.value }} {{ random }}`,
-  styleUrl: './cell.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'app-table-cell',
+    imports: [CommonModule],
+    template: `{{ cell?.value }} {{ random }}`,
+    styleUrl: './cell.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CellComponent implements OnChanges {
   @Input() cell: IUICell | undefined;

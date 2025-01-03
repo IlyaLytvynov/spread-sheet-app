@@ -8,10 +8,9 @@ import {
 } from '@angular/core';
 
 @Component({
-  selector: 'app-spreadsheet-top-bar',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'app-spreadsheet-top-bar',
+    imports: [CommonModule],
+    template: `
     <div
       class="column"
       *ngFor="let column of columns; let i = index"
@@ -21,7 +20,7 @@ import {
       {{ column }}
     </div>
   `,
-  styleUrl: './top-bar.component.scss',
+    styleUrl: './top-bar.component.scss'
 })
 export class TopBarComponent {
   @Input() columns: string[] | undefined;

@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-editor',
-  templateUrl: './editor.component.html',
-  styleUrl: './editor.component.scss',
+    selector: 'app-editor',
+    templateUrl: './editor.component.html',
+    styleUrl: './editor.component.scss',
+    standalone: false
 })
 export class EditorComponent {
   spreadSheet = {

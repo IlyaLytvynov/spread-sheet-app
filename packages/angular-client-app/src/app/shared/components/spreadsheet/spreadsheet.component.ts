@@ -19,17 +19,16 @@ const LEFT_BAR_WIDTH_CSS_VAR = '--spreadSheetLeftBarWidth';
 const TOP_BAR_HEIGHT_CSS_VAR = '--spreadSheetTopBarHeight';
 
 @Component({
-  selector: 'app-spreadsheet',
-  standalone: true,
-  imports: [
-    CommonModule,
-    RootComponent,
-    RowComponent,
-    CellComponent,
-    TopBarComponent,
-    LeftBarComponent,
-  ],
-  template: `
+    selector: 'app-spreadsheet',
+    imports: [
+        CommonModule,
+        RootComponent,
+        RowComponent,
+        CellComponent,
+        TopBarComponent,
+        LeftBarComponent,
+    ],
+    template: `
     <app-spreadsheet-top-bar
       [columns]="columns"
       [height]="columnTitleHeight"
@@ -54,8 +53,8 @@ const TOP_BAR_HEIGHT_CSS_VAR = '--spreadSheetTopBarHeight';
       </app-table-row>
     </div>
   `,
-  styleUrl: './spreadsheet.component.scss',
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    styleUrl: './spreadsheet.component.scss',
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SpreadsheetComponent {
   @Input() spreadSheet: SpreadSheetData = {};
