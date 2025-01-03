@@ -1,10 +1,15 @@
 export type TableLayout = IUICell[][];
 
-export interface IUICell {
+
+export interface ICell {
   value: string;
-  hasFocus: boolean;
   columnIndex: string;
   rowIndex: number;
+}
+
+
+export interface IUICell extends ICell {
+  hasFocus: boolean;
   height: number;
   width: number;
   focus(): IUICell;
