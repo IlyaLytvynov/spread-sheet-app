@@ -8,4 +8,15 @@
   > * {
     border: 1px solid blue;
   }
+  .row {
+    position: relative;
+  }
+  .line {
+    width: 100vw;
+    background-color: red;
+    height: 5px;
+    position: absolute;
+    left: 0;
+    cursor: pointer;
+  }
 }

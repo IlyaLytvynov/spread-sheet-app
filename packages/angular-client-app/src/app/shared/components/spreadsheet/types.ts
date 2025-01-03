@@ -5,6 +5,8 @@ export interface IUICell {
   hasFocus: boolean;
   columnIndex: string;
   rowIndex: number;
+  height: number;
+  width: number;
   focus(): IUICell;
   blur(): IUICell;
 }

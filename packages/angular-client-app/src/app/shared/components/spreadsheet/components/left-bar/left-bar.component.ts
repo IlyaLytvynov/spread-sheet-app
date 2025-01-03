@@ -4,13 +4,16 @@ import {
   HostBinding,
   Input,
   Output,
+  ViewEncapsulation,
 } from '@angular/core';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-spreadsheet-left-bar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DragDropModule],
+  encapsulation: ViewEncapsulation.Emulated,
   template: `
     <div
       class="row"
@@ -18,7 +21,15 @@ import { CommonModule } from '@angular/common';
       (click)="onSelect(i)"
       [style.height.px]="height"
     >
-      {{ i }}
+      <span>{{ i }}</span>
+      <span
+        cdkDrag
+        cdkDragLockAxis="y"
+        class="line"
+        (cdkDragStarted)="onDragStart($event, i)"
+        (cdkDragDropped)="onDragDropped($event)"
+        (cdkDragEnded)="onDragEnded($event)"
+      ></span>
     </div>
   `,
   styleUrl: './left-bar.component.scss',
@@ -28,6 +39,7 @@ export class LeftBarComponent {
   @Input() rowsCount: number | undefined;
 
   @Output() select: EventEmitter<number> = new EventEmitter();
+  @Output() resize: EventEmitter<number> = new EventEmitter();
 
   @HostBinding('style.height') get rowHeight() {
     return `${this.height}px`;
@@ -48,5 +60,21 @@ export class LeftBarComponent {
 
   onSelect(i: number) {
     this.select.emit(i);
+  }
+
+  onDragStart(event: any, i: any) {
+    console.log(event, i);
+  }
+
+  onDragMove(event: any, i: any) {
+    console.log(event, i);
+  }
+
+  onDragDropped(event: any) {
+    console.log(event);
+  }
+
+  onDragEnded(event: any) {
+    console.log(event);
   }
 }

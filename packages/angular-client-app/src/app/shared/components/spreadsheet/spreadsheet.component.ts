@@ -47,8 +47,8 @@ const TOP_BAR_HEIGHT_CSS_VAR = '--spreadSheetTopBarHeight';
           *ngFor="let cell of row; let cellIndex = index"
           [cell]="cell"
           (click)="selectCell(cell)"
-          [width]="columnDefaultWidth"
-          [height]="rowDefaultHeight"
+          [width]="cell.width"
+          [height]="cell.height"
         >
         </app-table-cell>
       </app-table-row>
@@ -77,10 +77,7 @@ export class SpreadsheetComponent {
     private cDRef: ChangeDetectorRef,
     private renderer: Renderer2,
     private elRef: ElementRef
-  ) {
-    //@ts-ignore
-    window.spreadsheet = this;
-  }
+  ) {}
 
   get columns() {
     return this.table.columns;
