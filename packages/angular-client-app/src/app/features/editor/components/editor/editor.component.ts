@@ -1,35 +1,55 @@
-import { Component, computed, inject } from '@angular/core';
-import { SpreadsheetStore } from '../../editor.store';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  inject,
+  OnInit,
+  PLATFORM_ID,
+  ViewEncapsulation,
+} from '@angular/core';
+import { SpreadsheetStore } from '../../store/editor.store';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-editor',
-  template: `
-      <h2>{{ workbook().name }}</h2>
-      <div *ngFor="let row of rows">
-        <input
-          *ngFor="let col of cols"
-          [value]="getCellValue(activeSheetId(), col + row)"
-          (input)="updateCell(activeSheetId(), col + row, $event)"
-        />
-      </div>
-    `,
+  templateUrl: './editor.component.html',
   styleUrl: './editor.component.scss',
   standalone: false,
+  encapsulation: ViewEncapsulation.ShadowDom,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditorComponent {
+export class EditorComponent implements OnInit {
   store = inject(SpreadsheetStore);
   workbook = this.store.workbook;
   activeSheetId = computed(() => this.workbook().activeSheetId);
+  activeSheet = computed(() => this.workbook().sheets[this.activeSheetId()]);
+  private platformId = inject(PLATFORM_ID);
 
   rows = ['1', '2', '3', '4', '5'];
   cols = ['A', 'B', 'C', 'D', 'E'];
 
-  getCellValue(sheetId: string, cellId: string) {
-    return this.workbook().sheets[sheetId]?.cells[cellId]?.value || '';
+  getCellValue(cellId: string) {
+    return this.activeSheet()?.cells[cellId]?.value || '';
   }
 
-  updateCell(sheetId: string, cellId: string, event: Event) {
+  getCell(cellId: string) {
+    return this.activeSheet()?.cells[cellId];
+  }
+
+  updateCell(cellId: string, event: Event) {
     const inputElement = event.target as HTMLInputElement;
-    this.store.updateCell(sheetId, cellId, inputElement.value);
+    this.store.updateCell(this.activeSheetId(), cellId, inputElement.value);
+  }
+
+  ngOnInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      setInterval(() => {
+        this.store.updateCell(
+          this.activeSheetId(),
+          'A1',
+          Math.ceil(Math.random() * 99)
+        );
+      }, 4000);
+    }
   }
 }

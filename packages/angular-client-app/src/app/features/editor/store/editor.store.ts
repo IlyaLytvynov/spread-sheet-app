@@ -1,25 +1,7 @@
 import { Injectable, signal } from '@angular/core';
+import { IWorkbook } from '../types';
 
-interface Cell {
-  value: string | number | null;
-  formula?: string;
-  computedValue?: string | number | null;
-}
-
-interface Sheet {
-  id: string;
-  name: string;
-  cells: Record<string, Cell>;
-}
-
-interface Workbook {
-  id: string;
-  name: string;
-  sheets: Record<string, Sheet>;
-  activeSheetId: string;
-}
-
-const mockWorkBook = {
+const mockWorkBook: IWorkbook = {
   id: '1',
   name: 'My Spreadsheet 111',
   sheets: {
@@ -34,7 +16,11 @@ const mockWorkBook = {
           value: 5,
         },
         "A2": {
-          value: 15
+          value: 15,
+          styles: {
+            alignment: 'left',
+            backgroundColor: '#00ff00'
+          }
         },
         "C1": {
           value: null,
@@ -49,8 +35,13 @@ const mockWorkBook = {
 
 @Injectable({ providedIn: 'root' })
 export class SpreadsheetStore {
-  workbook = signal<Workbook>(mockWorkBook);
-
+  workbook = signal<IWorkbook>(mockWorkBook);
+  /**
+   *
+   * @param sheetId id of sheet to update
+   * @param cellId col + row for example A1, Y300
+   * @param newValue any of value type
+   */
   updateCell(sheetId: string, cellId: string, newValue: string | number) {
     this.workbook.update((workbook) => {
       const sheet = workbook.sheets[sheetId];
