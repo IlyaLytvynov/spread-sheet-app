@@ -16,6 +16,8 @@ export interface ICell {
   styles?: ICellStyles
 }
 
+export type CellValue = ICell['value']
+
 export interface ISheet {
   id: string;
   name: string;

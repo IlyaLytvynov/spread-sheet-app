@@ -1,8 +1,15 @@
 :host {
+  .wrapper {
+    width: 100%;
+    padding: 10px;
+    
+  }
+  .row {
+    display: flex;
+    border: 1px solid black
+  }
 
 }
 
-.row {
-  display: flex;
-  border: 1px solid black
-}
+
+

@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { SpreadsheetStore } from '../../store/editor.store';
 import { isPlatformBrowser } from '@angular/common';
+import { ICell } from '../../types';
 
 @Component({
   selector: 'app-editor',
@@ -25,7 +26,7 @@ export class EditorComponent implements OnInit {
   activeSheet = computed(() => this.workbook().sheets[this.activeSheetId()]);
   private platformId = inject(PLATFORM_ID);
 
-  rows = ['1', '2', '3', '4', '5'];
+  rows = ['1', '2', '3', '4', '5', ];
   cols = ['A', 'B', 'C', 'D', 'E'];
 
   getCellValue(cellId: string) {
@@ -36,20 +37,11 @@ export class EditorComponent implements OnInit {
     return this.activeSheet()?.cells[cellId];
   }
 
-  updateCell(cellId: string, event: Event) {
-    const inputElement = event.target as HTMLInputElement;
-    this.store.updateCell(this.activeSheetId(), cellId, inputElement.value);
+  updateCell(cellId: string, value: ICell) {
+    this.store.updateCell(this.activeSheetId(), cellId, value);
   }
 
   ngOnInit() {
-    if (isPlatformBrowser(this.platformId)) {
-      setInterval(() => {
-        this.store.updateCell(
-          this.activeSheetId(),
-          'A1',
-          Math.ceil(Math.random() * 99)
-        );
-      }, 4000);
-    }
+
   }
 }

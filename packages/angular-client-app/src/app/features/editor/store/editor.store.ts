@@ -1,5 +1,5 @@
 import { Injectable, signal } from '@angular/core';
-import { IWorkbook } from '../types';
+import { ICell, IWorkbook } from '../types';
 
 const mockWorkBook: IWorkbook = {
   id: '1',
@@ -40,13 +40,13 @@ export class SpreadsheetStore {
    *
    * @param sheetId id of sheet to update
    * @param cellId col + row for example A1, Y300
-   * @param newValue any of value type
+   * @param newValue ICell
    */
-  updateCell(sheetId: string, cellId: string, newValue: string | number) {
+  updateCell(sheetId: string, cellId: string, cell: ICell) {
     this.workbook.update((workbook) => {
       const sheet = workbook.sheets[sheetId];
       if (sheet) {
-        sheet.cells[cellId] = { value: newValue };
+        sheet.cells[cellId] = cell;
       }
       return { ...workbook };
     });

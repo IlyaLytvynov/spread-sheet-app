@@ -1,12 +1,17 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   EventEmitter,
+  inject,
   Input,
+  OnDestroy,
   Output,
   signal,
+  ViewChild,
   ViewEncapsulation,
 } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { ICell } from '../../types';
 import { CommonModule } from '@angular/common';
 
@@ -18,25 +23,110 @@ import { CommonModule } from '@angular/common';
   encapsulation: ViewEncapsulation.ShadowDom,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CellComponent {
+export class CellComponent implements OnDestroy {
   @Input() cell: ICell | null = null;
   @Output() update: EventEmitter<ICell> = new EventEmitter();
 
-  editValue = signal<string>('');
+  @ViewChild('editInput') editInput?: ElementRef<HTMLInputElement>;
+
+  private elementRef = inject(ElementRef);
+  private document = inject(DOCUMENT);
+  private documentClickListener?: (event: MouseEvent) => void;
+  private keydownListener?: (event: KeyboardEvent) => void;
+
+  editValue = signal<ICell['value']>(this.cell?.value || '');
   edit = signal<boolean>(false);
 
   get random() {
     return Math.ceil(Math.random() * 200);
   }
 
-  toggleEdit() {}
-
-  enableEdit() {
-    this.editValue.set(this.cell?.value);
-    this.edit.set(true);
+  ngOnDestroy() {
+    this.removeEventListeners();
   }
 
-  disbaleEdit() {
+  private addEventListeners() {
+    // Add document click listener
+    this.documentClickListener = (event: MouseEvent) => {
+      const clickedInside = this.elementRef.nativeElement.contains(event.target as Node);
+      if (!clickedInside) {
+        this.saveAndDisableEdit();
+      }
+    };
+    this.document.addEventListener('click', this.documentClickListener);
+
+    // Add keydown listener
+    this.keydownListener = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        this.cancelEdit();
+      } else if (event.key === 'Enter') {
+        event.preventDefault();
+        this.saveAndDisableEdit();
+      }
+    };
+    this.document.addEventListener('keydown', this.keydownListener);
+  }
+
+  private removeEventListeners() {
+    if (this.documentClickListener) {
+      this.document.removeEventListener('click', this.documentClickListener);
+      this.documentClickListener = undefined;
+    }
+    if (this.keydownListener) {
+      this.document.removeEventListener('keydown', this.keydownListener);
+      this.keydownListener = undefined;
+    }
+  }
+
+  toggleEdit() {
+    if (this.edit()) {
+      this.saveAndDisableEdit();
+    } else {
+      this.enableEdit();
+    }
+  }
+
+  enableEdit() {
+    const editValue = this.cell?.value || '';
+    this.editValue.set(editValue);
+    this.edit.set(true);
+
+    // Add event listeners only when entering edit mode
+    this.addEventListeners();
+
+    // Focus the input after the view updates
+    setTimeout(() => {
+      this.editInput?.nativeElement.focus();
+      this.editInput?.nativeElement.select();
+    });
+  }
+
+  disableEdit() {
     this.edit.set(false);
+    // Remove event listeners when exiting edit mode
+    this.removeEventListeners();
+  }
+
+  saveAndDisableEdit() {
+    // Create updated cell with new value
+    const updatedCell: ICell = {
+      ...this.cell,
+      value: this.editValue() || null,
+    };
+
+    this.update.emit(updatedCell);
+    this.disableEdit();
+  }
+
+  cancelEdit() {
+    // Reset to original value without saving
+    this.editValue.set(this.cell?.value || null);
+    this.disableEdit();
+  }
+
+  onInputChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.editValue.set(target.value);
   }
 }

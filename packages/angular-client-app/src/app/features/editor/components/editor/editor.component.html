@@ -1,12 +1,11 @@
 <h2>{{ workbook().name }}</h2>
-<div class="row" *ngFor="let row of rows">
-  <editor-cell
-    *ngFor="let col of cols"
-    [cell]="getCell(col + row)"
-  ></editor-cell>
-  <!-- <input
-    *ngFor="let col of cols"
-    [value]="getCellValue(activeSheetId(), col + row)"
-    (input)="updateCell(activeSheetId(), col + row, $event)"
-  /> -->
+<div class="wrapper">
+  <div class="row" *ngFor="let row of rows">
+    <editor-cell
+      *ngFor="let col of cols"
+      [cell]="getCell(col + row)"
+      (update)="updateCell(col + row, $event)"
+    ></editor-cell>
+  </div>
+
 </div>
