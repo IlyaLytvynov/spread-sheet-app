@@ -1,0 +1,186 @@
+# Monorepo Cursor Rules
+
+## Project Structure
+- This is a monorepo with multiple packages under `/packages/`
+- Each package may have different technologies and patterns
+- Always maintain consistent patterns within each package
+- Use relative imports within packages, absolute imports with aliases when available
+
+## General Principles
+- Prefer composition over inheritance
+- Write self-documenting code with clear naming
+- Follow SOLID principles
+- Prefer immutable data patterns
+- Write code that is easy to test and maintain
+- Use TypeScript strictly - avoid `any` types
+- Prefer explicit over implicit when it improves clarity
+
+---
+
+# Angular Package Rules (`packages/angular-client-app/`)
+
+## Architecture Patterns
+
+### Component Structure
+- Use **standalone components** for new components when possible
+- Mix with NgModules only when necessary for complex lazy loading
+- Follow feature-based folder structure: `/features/{feature-name}/components/{component-name}/`
+- Each component folder should contain: `*.component.ts`, `*.component.html`, `*.component.scss`, `*.component.spec.ts`, `index.ts`
+- Export components from `index.ts` for clean imports
+
+### Component Best Practices
+```typescript
+@Component({
+  selector: 'feature-component-name', // Use feature prefix
+  imports: [CommonModule, /* other standalone components */],
+  templateUrl: './component.component.html',
+  styleUrl: './component.component.scss',
+  encapsulation: ViewEncapsulation.ShadowDom, // Prefer ShadowDom for isolation
+  changeDetection: ChangeDetectionStrategy.OnPush, // Always use OnPush
+})
+```
+
+### State Management
+- Use Angular signals for reactive state management
+- Store services should be injectable with `providedIn: 'root'`
+- Use `signal()` for mutable state and `computed()` for derived state
+- Update signals immutably using `.update()` method
+- Akita is available but prefer Angular signals for new code
+
+### Services
+- All services should use `@Injectable({ providedIn: 'root' })`
+- Use dependency injection via `inject()` function in components and services
+- Services should be placed in appropriate feature folders or `/core/services/`
+- Use constructor injection only when necessary (legacy compatibility)
+
+### Types and Interfaces
+- Define all types in `types.ts` files within feature folders
+- Use PascalCase with `I` prefix for interfaces (e.g., `ICell`, `IWorkbook`)
+- Export type aliases for commonly used types (e.g., `type CellValue = ICell['value']`)
+- Use `Record<string, T>` for key-value mappings
+
+### Routing
+- Use lazy loading with `loadChildren` for feature modules
+- Feature routes should be defined in `{feature}.route.ts` files
+- Main routes in `app.routes.ts` should delegate to feature routes
+
+### Styling
+- Use SCSS for all styling
+- Component styles should be scoped using ShadowDom encapsulation
+- Global styles go in `src/styles.scss`
+- Follow CSS naming conventions (kebab-case for classes)
+
+### Testing
+- Use Jest with jest-preset-angular
+- Test files should have `.spec.ts` extension
+- Write unit tests for all components, services, and pipes
+- Mock external dependencies in tests
+- Use path mapping `@core/*` for imports in tests
+
+### File Organization
+```
+src/app/
+├── core/                    # Core application services and configuration
+│   ├── services/           # Global services
+│   └── core.config.ts      # Core providers configuration
+├── features/               # Feature modules
+│   └── {feature-name}/
+│       ├── components/     # Feature components
+│       ├── store/         # Feature state management
+│       ├── types.ts       # Feature type definitions
+│       ├── {feature}.module.ts
+│       └── {feature}.route.ts
+├── shared/                 # Shared utilities and types
+│   └── types/             # Global type definitions
+├── app.component.*        # Root component
+├── app.config.ts          # Application configuration
+└── app.routes.ts          # Main routing configuration
+```
+
+### Import Patterns
+- Use path mapping with `@core/*` alias
+- Import Angular modules from `@angular/core`, `@angular/common`, etc.
+- Import shared components using relative paths within features
+- Use index.ts files for clean exports
+
+### Event Handling
+- Use proper TypeScript typing for events
+- Emit custom events using `@Output() eventName = new EventEmitter<T>()`
+- Handle DOM events with proper event typing
+- Add and remove event listeners in lifecycle hooks (ngOnDestroy)
+
+### Dependency Injection
+- Use `inject()` function for dependency injection in new code
+- Inject common services like `DOCUMENT`, `ElementRef` when needed
+- Use `@ViewChild()` for template references with proper typing
+
+### Code Style
+- Use single quotes for strings
+- Prefer template literals for complex strings
+- Use optional chaining (`?.`) and nullish coalescing (`??`)
+- Destructure objects and arrays when appropriate
+- Use meaningful variable and function names
+
+### Performance
+- Always use `ChangeDetectionStrategy.OnPush`
+- Use `ViewEncapsulation.ShadowDom` for style isolation
+- Avoid memory leaks by cleaning up subscriptions and event listeners
+- Use `setTimeout()` for DOM updates that require view rendering
+
+### Angular Specific Rules
+- Angular version: 19.x
+- Use SSR capabilities when beneficial
+- Prefer reactive programming with signals over RxJS when possible
+- Use standalone components as the default approach
+- Follow Angular style guide conventions
+
+## Common Patterns to Follow
+
+### Signal-based Reactive State
+```typescript
+export class MyStore {
+  private _data = signal<MyData[]>([]);
+  readonly data = this._data.asReadonly();
+  
+  updateData(newData: MyData) {
+    this._data.update(current => [...current, newData]);
+  }
+}
+```
+
+### Component with Proper Lifecycle Management
+```typescript
+export class MyComponent implements OnDestroy {
+  private destroy$ = new Subject<void>();
+  
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+}
+```
+
+### Proper Event Listener Management
+```typescript
+export class MyComponent implements OnDestroy {
+  private eventListeners: (() => void)[] = [];
+  
+  private addEventListeners() {
+    const listener = () => { /* handler */ };
+    document.addEventListener('event', listener);
+    this.eventListeners.push(() => document.removeEventListener('event', listener));
+  }
+  
+  ngOnDestroy() {
+    this.eventListeners.forEach(cleanup => cleanup());
+  }
+}
+```
+
+## Code Generation Guidelines
+- Always include proper TypeScript types
+- Add necessary imports automatically
+- Follow the established folder structure
+- Include basic tests for new components/services
+- Use the existing configuration and setup patterns
+- Maintain consistency with existing code style and patterns 

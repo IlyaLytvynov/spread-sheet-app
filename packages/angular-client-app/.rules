@@ -1,0 +1,358 @@
+# Angular Client App Cursor Rules
+
+## Technology Stack
+- Angular 19.x with SSR
+- TypeScript 5.5
+- SCSS for styling
+- Jest for testing
+- Akita for state management (legacy)
+- Angular Signals (preferred for new code)
+
+## Component Development
+
+### Standalone Component Template
+```typescript
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  inject,
+  Input,
+  Output,
+  signal,
+  ViewEncapsulation,
+} from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'feature-component-name',
+  imports: [CommonModule],
+  templateUrl: './component.component.html',
+  styleUrl: './component.component.scss',
+  encapsulation: ViewEncapsulation.ShadowDom,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+})
+export class ComponentNameComponent {
+  @Input() inputProperty: Type | null = null;
+  @Output() outputEvent = new EventEmitter<Type>();
+
+  // Use signals for internal state
+  internalState = signal<Type>(defaultValue);
+
+  // Inject dependencies using inject()
+  private service = inject(ServiceName);
+}
+```
+
+### Component File Structure
+Each component should have these files:
+- `component-name.component.ts` - Component logic
+- `component-name.component.html` - Template
+- `component-name.component.scss` - Styles
+- `component-name.component.spec.ts` - Tests
+- `index.ts` - Export file
+
+### Event Handling Patterns
+```typescript
+// DOM Event Listeners with Cleanup
+export class ComponentWithEvents implements OnDestroy {
+  private eventCleanup: (() => void)[] = [];
+
+  ngOnDestroy() {
+    this.eventCleanup.forEach(cleanup => cleanup());
+  }
+
+  private addEventListeners() {
+    const handleClick = (event: MouseEvent) => {
+      // Handle click
+    };
+
+    document.addEventListener('click', handleClick);
+    this.eventCleanup.push(() =>
+      document.removeEventListener('click', handleClick)
+    );
+  }
+}
+```
+
+## State Management
+
+### Signal-based Store Pattern
+```typescript
+import { Injectable, signal } from '@angular/core';
+import { IDataType } from '../types';
+
+@Injectable({ providedIn: 'root' })
+export class FeatureStore {
+  // Private signals for mutable state
+  private _data = signal<IDataType[]>([]);
+  private _loading = signal<boolean>(false);
+
+  // Public readonly access
+  readonly data = this._data.asReadonly();
+  readonly loading = this._loading.asReadonly();
+
+  // Actions
+  setLoading(loading: boolean) {
+    this._loading.set(loading);
+  }
+
+  updateData(newData: IDataType) {
+    this._data.update(current => [...current, newData]);
+  }
+
+  removeData(id: string) {
+    this._data.update(current =>
+      current.filter(item => item.id !== id)
+    );
+  }
+}
+```
+
+## Service Development
+
+### Service Template
+```typescript
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class FeatureService {
+  private http = inject(HttpClient);
+
+  getData(): Observable<DataType[]> {
+    return this.http.get<DataType[]>('/api/data');
+  }
+}
+```
+
+## Type Definitions
+
+### Interface Naming and Structure
+```typescript
+// Use I prefix for interfaces
+export interface ICell {
+  value: string | number | null;
+  formula?: string;
+  computedValue?: string | number | null;
+  styles?: ICellStyles;
+}
+
+// Export type aliases for reusability
+export type CellValue = ICell['value'];
+
+// Use Record for key-value mappings
+export interface ISheet {
+  id: string;
+  name: string;
+  cells: Record<string, ICell>; // key-value mapping
+}
+```
+
+## Routing
+
+### Feature Route Configuration
+```typescript
+// features/feature-name/feature-name.route.ts
+import { Routes } from '@angular/router';
+import { FeatureComponent } from './components/feature/feature.component';
+
+export const featureRoutes: Routes = [
+  {
+    path: '',
+    component: FeatureComponent,
+  },
+  {
+    path: 'sub-route',
+    component: SubComponent,
+  }
+];
+```
+
+### Main Route Integration
+```typescript
+// app.routes.ts
+export const routes: Routes = [
+  {
+    path: 'feature',
+    loadChildren: () =>
+      import('./features/feature/feature.module').then(
+        (m) => m.FeatureModule
+      ),
+  },
+];
+```
+
+## Testing
+
+### Component Test Template
+```typescript
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentName } from './component-name.component';
+
+describe('ComponentName', () => {
+  let component: ComponentName;
+  let fixture: ComponentFixture<ComponentName>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ComponentName] // For standalone components
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(ComponentName);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+```
+
+### Service Test Template
+```typescript
+import { TestBed } from '@angular/core/testing';
+import { ServiceName } from './service-name.service';
+
+describe('ServiceName', () => {
+  let service: ServiceName;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(ServiceName);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});
+```
+
+## File Path Patterns
+
+### Import Aliases
+- `@core/*` maps to `src/app/core/*`
+- Use relative imports within the same feature
+- Use absolute imports for cross-feature dependencies
+
+### Directory Structure
+```
+src/app/
+├── core/
+│   ├── services/
+│   │   └── auth/
+│   │       ├── auth.service.ts
+│   │       ├── auth.service.spec.ts
+│   │       └── index.ts
+│   └── core.config.ts
+├── features/
+│   └── editor/
+│       ├── components/
+│       │   ├── cell/
+│       │   │   ├── cell.component.ts
+│       │   │   ├── cell.component.html
+│       │   │   ├── cell.component.scss
+│       │   │   ├── cell.component.spec.ts
+│       │   │   └── index.ts
+│       │   └── editor/
+│       ├── store/
+│       │   ├── editor.store.ts
+│       │   └── index.ts
+│       ├── types.ts
+│       ├── editor.module.ts
+│       └── editor.route.ts
+└── shared/
+    └── types/
+```
+
+## Styling Guidelines
+
+### SCSS Structure
+```scss
+// component.component.scss
+:host {
+  display: block;
+
+  .component-wrapper {
+    // Component-specific styles
+  }
+
+  &.modifier-class {
+    // Modifier styles
+  }
+}
+
+// Use CSS custom properties for theming
+:host {
+  --primary-color: #007bff;
+  --secondary-color: #6c757d;
+}
+```
+
+### Shadow DOM Styling
+- Use `:host` selector for component root
+- Use CSS custom properties for theme variables
+- Avoid global style dependencies
+
+## Performance Guidelines
+
+### Change Detection
+- Always use `OnPush` change detection strategy
+- Use signals to trigger change detection efficiently
+- Minimize unnecessary re-renders
+
+### Memory Management
+- Implement `OnDestroy` for cleanup
+- Remove event listeners in `ngOnDestroy`
+- Unsubscribe from observables when using RxJS
+
+### Bundle Optimization
+- Use lazy loading for feature modules
+- Implement tree-shaking friendly imports
+- Avoid importing entire libraries when only specific functions are needed
+
+## Code Quality
+
+### TypeScript Best Practices
+- Enable strict mode in tsconfig.json
+- Avoid `any` type - use proper typing
+- Use type guards for runtime type checking
+- Prefer interfaces over types for object shapes
+
+### Error Handling
+```typescript
+// Service error handling
+import { catchError, throwError } from 'rxjs';
+
+getData(): Observable<DataType[]> {
+  return this.http.get<DataType[]>('/api/data').pipe(
+    catchError(error => {
+      console.error('API Error:', error);
+      return throwError(() => new Error('Failed to fetch data'));
+    })
+  );
+}
+```
+
+## Development Workflow
+
+### New Component Checklist
+1. Create component folder in appropriate feature
+2. Generate component files (ts, html, scss, spec.ts)
+3. Add to index.ts export
+4. Write basic tests
+5. Add to module imports if using modules
+6. Update types.ts if new interfaces are needed
+
+### New Feature Checklist
+1. Create feature folder under `src/app/features/`
+2. Set up component structure
+3. Create feature module and routes
+4. Add store/state management
+5. Define types in types.ts
+6. Add feature route to main routes
+7. Write comprehensive tests
