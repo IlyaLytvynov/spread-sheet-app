@@ -10,10 +10,12 @@ import {
   signal,
   ViewChild,
   ViewEncapsulation,
+  computed,
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { ICell } from '../../types';
 import { CommonModule } from '@angular/common';
+import { processStyles } from '../../utils/style-processor';
 
 @Component({
   selector: 'editor-cell',
@@ -36,6 +38,9 @@ export class CellComponent implements OnDestroy {
 
   editValue = signal<ICell['value']>(this.cell?.value || '');
   edit = signal<boolean>(false);
+
+  // Computed signal using styleProcessor utility
+  cellStyles = computed(() => processStyles(this.cell?.styles));
 
   get random() {
     return Math.ceil(Math.random() * 200);

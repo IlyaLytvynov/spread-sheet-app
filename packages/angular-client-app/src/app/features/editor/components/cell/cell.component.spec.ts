@@ -3,7 +3,8 @@ import { DebugElement, signal } from '@angular/core';
 import { By } from '@angular/platform-browser';
 
 import { CellComponent } from './cell.component';
-import { ICell } from '../../types';
+import { ICell, ICellStyles } from '../../types';
+import * as styleProcessor from '../../utils/style-processor';
 
 describe('CellComponent', () => {
   let component: CellComponent;
@@ -412,6 +413,255 @@ describe('CellComponent', () => {
       expect(preventDefaultSpy).not.toHaveBeenCalled();
       expect(component.cancelEdit).not.toHaveBeenCalled();
       expect(component.saveAndDisableEdit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Style Processing', () => {
+    describe('cellStyles computed signal', () => {
+      it('should return empty styles when cell has no styles', () => {
+        const cellWithoutStyles: ICell = { value: 'Test' };
+        component.cell = cellWithoutStyles;
+        fixture.detectChanges();
+
+        const styles = component.cellStyles();
+        expect(styles).toEqual({});
+      });
+
+      it('should return empty styles when cell is null', () => {
+        component.cell = null;
+        fixture.detectChanges();
+
+        const styles = component.cellStyles();
+        expect(styles).toEqual({});
+      });
+
+      it('should call processStyles with cell styles', () => {
+        const processStylesSpy = jest.spyOn(styleProcessor, 'processStyles');
+        const cellStyles: ICellStyles = {
+          backgroundColor: '#ff0000',
+          textColor: '#000000',
+          bold: true
+        };
+        const cellWithStyles: ICell = { value: 'Test', styles: cellStyles };
+        component.cell = cellWithStyles;
+        fixture.detectChanges();
+
+        component.cellStyles();
+
+        expect(processStylesSpy).toHaveBeenCalledWith(cellStyles);
+        processStylesSpy.mockRestore();
+      });
+
+      it('should return processed styles from utility function', () => {
+        const mockProcessedStyles = {
+          'background-color': '#ff0000',
+          'color': '#000000',
+          'font-weight': 'bold'
+        };
+        const processStylesSpy = jest.spyOn(styleProcessor, 'processStyles').mockReturnValue(mockProcessedStyles);
+
+        component.cell = mockCell;
+        fixture.detectChanges();
+
+        const styles = component.cellStyles();
+        expect(styles).toEqual(mockProcessedStyles);
+
+        processStylesSpy.mockRestore();
+      });
+
+      it('should be reactive to cell changes', () => {
+        // Start with one cell
+        const cellA: ICell = { value: 'A', styles: { backgroundColor: '#ff0000' } };
+        component.cell = cellA;
+        fixture.detectChanges();
+
+        const stylesA = component.cellStyles();
+        expect(stylesA).toEqual({ 'background-color': '#ff0000' });
+
+        // Change to different cell
+        const cellB: ICell = { value: 'B', styles: { textColor: '#00ff00' } };
+        component.cell = cellB;
+        // Create a new fixture to test reactivity properly
+        const newFixture = TestBed.createComponent(CellComponent);
+        const newComponent = newFixture.componentInstance;
+        newComponent.cell = cellB;
+        newFixture.detectChanges();
+
+        const stylesB = newComponent.cellStyles();
+        expect(stylesB).toEqual({ 'color': '#00ff00' });
+      });
+    });
+
+    describe('Template Style Integration', () => {
+      beforeEach(() => {
+        component.cell = {
+          value: 'Styled Cell',
+          styles: {
+            backgroundColor: '#ffff00',
+            textColor: '#000000',
+            bold: true,
+            fontSize: 16,
+            alignment: 'center'
+          }
+        };
+        fixture.detectChanges();
+      });
+
+      it('should apply styles to content div', () => {
+        const contentDiv = fixture.debugElement.query(By.css('.content'));
+        expect(contentDiv).toBeTruthy();
+
+        // Verify ngStyle directive is present
+        const ngStyleDirective = contentDiv.injector.get('ngStyle', null);
+        expect(contentDiv.attributes['ng-reflect-ng-style']).toBeDefined();
+      });
+
+      it('should apply styles to input element when in edit mode', () => {
+        component.enableEdit();
+        fixture.detectChanges();
+
+        const inputElement = fixture.debugElement.query(By.css('input'));
+        expect(inputElement).toBeTruthy();
+
+        // Verify ngStyle directive is present on input
+        expect(inputElement.attributes['ng-reflect-ng-style']).toBeDefined();
+      });
+
+      it('should update template when styles change', () => {
+        // Get initial styles
+        const initialStyles = component.cellStyles();
+        expect(Object.keys(initialStyles)).toHaveLength(5); // All 5 styles from beforeEach
+
+        // Create new component with different styles
+        const newFixture = TestBed.createComponent(CellComponent);
+        const newComponent = newFixture.componentInstance;
+        newComponent.cell = {
+          value: 'Updated Cell',
+          styles: {
+            backgroundColor: '#00ff00',
+            italic: true
+          }
+        };
+        newFixture.detectChanges();
+
+        const updatedStyles = newComponent.cellStyles();
+        expect(updatedStyles).toEqual({
+          'background-color': '#00ff00',
+          'font-style': 'italic'
+        });
+        expect(updatedStyles).not.toEqual(initialStyles);
+      });
+    });
+
+    describe('Style Behavior Edge Cases', () => {
+      it('should handle cell with empty styles object', () => {
+        const cellWithEmptyStyles: ICell = { value: 'Test', styles: {} };
+        component.cell = cellWithEmptyStyles;
+        fixture.detectChanges();
+
+        const styles = component.cellStyles();
+        expect(styles).toEqual({});
+      });
+
+      it('should handle cell with only false boolean values', () => {
+        const cellWithFalseStyles: ICell = {
+          value: 'Test',
+          styles: {
+            bold: false,
+            italic: false,
+            underline: false
+          }
+        };
+        component.cell = cellWithFalseStyles;
+        fixture.detectChanges();
+
+        const styles = component.cellStyles();
+        expect(styles).toEqual({});
+      });
+
+      it('should handle cell with mixed true/false boolean values', () => {
+        const cellWithMixedStyles: ICell = {
+          value: 'Test',
+          styles: {
+            bold: true,
+            italic: false,
+            underline: true
+          }
+        };
+        component.cell = cellWithMixedStyles;
+        fixture.detectChanges();
+
+        const styles = component.cellStyles();
+        expect(styles).toEqual({
+          'font-weight': 'bold',
+          'text-decoration': 'underline'
+        });
+      });
+
+      it('should handle rapid cell changes', () => {
+        const cells: ICell[] = [
+          { value: '1', styles: { backgroundColor: '#ff0000' } },
+          { value: '2', styles: { textColor: '#00ff00' } },
+          { value: '3', styles: { fontSize: 20 } },
+          { value: '4' } // No styles
+        ];
+
+        cells.forEach(cell => {
+          component.cell = cell;
+          fixture.detectChanges();
+          expect(() => component.cellStyles()).not.toThrow();
+        });
+      });
+    });
+
+    describe('Performance and Memory', () => {
+      it('should not create new style objects when cell styles unchanged', () => {
+        component.cell = mockCell;
+        fixture.detectChanges();
+
+        const styles1 = component.cellStyles();
+        const styles2 = component.cellStyles();
+
+        // Should return the same reference for computed signals when unchanged
+        expect(styles1).toEqual(styles2);
+      });
+
+      it('should handle null to styled cell transitions', () => {
+        // Start with null cell
+        const nullFixture = TestBed.createComponent(CellComponent);
+        const nullComponent = nullFixture.componentInstance;
+        nullComponent.cell = null;
+        nullFixture.detectChanges();
+        expect(nullComponent.cellStyles()).toEqual({});
+
+        // Transition to styled cell
+        const styledFixture = TestBed.createComponent(CellComponent);
+        const styledComponent = styledFixture.componentInstance;
+        styledComponent.cell = mockCell;
+        styledFixture.detectChanges();
+        const styles = styledComponent.cellStyles();
+        expect(styles).toEqual({
+          'font-weight': 'bold',
+          'font-size': '12px',
+          'color': '#000000'
+        });
+      });
+
+      it('should handle styled to null cell transitions', () => {
+        // Start with styled cell
+        const styledFixture = TestBed.createComponent(CellComponent);
+        const styledComponent = styledFixture.componentInstance;
+        styledComponent.cell = mockCell;
+        styledFixture.detectChanges();
+        expect(Object.keys(styledComponent.cellStyles())).toHaveLength(3);
+
+        // Transition to null cell
+        const nullFixture = TestBed.createComponent(CellComponent);
+        const nullComponent = nullFixture.componentInstance;
+        nullComponent.cell = null;
+        nullFixture.detectChanges();
+        expect(nullComponent.cellStyles()).toEqual({});
+      });
     });
   });
 });

@@ -1,8 +1,9 @@
-<div class="content" (dblclick)="enableEdit()">{{cell?.value}}</div>
+<div class="content" [ngStyle]="cellStyles()" (dblclick)="enableEdit()">{{cell?.value}}</div>
 <div class="edit" *ngIf="edit()">
   <input
     type="text"
     [value]="editValue()"
+    [ngStyle]="cellStyles()"
     (input)="onInputChange($event)"
     #editInput
     autofocus />

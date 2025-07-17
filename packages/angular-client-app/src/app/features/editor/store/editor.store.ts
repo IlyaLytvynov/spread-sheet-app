@@ -18,8 +18,13 @@ const mockWorkBook: IWorkbook = {
         "A2": {
           value: 15,
           styles: {
-            alignment: 'left',
-            backgroundColor: '#00ff00'
+            alignment: 'right',
+            backgroundColor: '#00ff00',
+            fontSize: 16,
+            italic: true,
+            underline: true,
+            textColor: '#000000',
+            bold: true,
           }
         },
         "C1": {

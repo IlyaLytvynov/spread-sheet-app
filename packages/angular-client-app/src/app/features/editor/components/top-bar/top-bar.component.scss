@@ -1,0 +1,254 @@
+.top-bar {
+  display: flex;
+  flex-direction: column;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  padding: 12px 16px;
+  gap: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Formula Section */
+.formula-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cell-reference {
+  font-weight: 600;
+  font-size: 14px;
+  color: #495057;
+  min-width: 60px;
+  text-align: center;
+  background: #e9ecef;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #ced4da;
+}
+
+.formula-bar {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 8px;
+}
+
+.formula-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: 'Courier New', monospace;
+  background: white;
+  transition: border-color 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  }
+
+  &::placeholder {
+    color: #6c757d;
+    font-style: italic;
+  }
+}
+
+.formula-btn {
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  min-width: 40px;
+
+  &:hover {
+    background: #e9ecef;
+    border-color: #adb5bd;
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &.apply-btn {
+    color: #28a745;
+
+    &:hover {
+      background: #d4edda;
+      border-color: #28a745;
+    }
+  }
+
+  &.clear-btn {
+    color: #dc3545;
+
+    &:hover {
+      background: #f8d7da;
+      border-color: #dc3545;
+    }
+  }
+}
+
+/* Formatting Section */
+.formatting-section {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  background: white;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+}
+
+.format-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  color: #495057;
+
+  &:hover {
+    background: #e9ecef;
+  }
+
+  &.active {
+    background: #007bff;
+    color: white;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.font-size-select {
+  padding: 6px 8px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 4px;
+  color: #495057;
+  min-width: 65px;
+
+  &:hover {
+    background: #e9ecef;
+  }
+
+  &:focus {
+    outline: none;
+    background: #e9ecef;
+  }
+}
+
+/* Color Controls */
+.color-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  position: relative;
+}
+
+.color-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #495057;
+  pointer-events: none;
+
+  &.bg-label {
+    font-size: 10px;
+  }
+}
+
+.color-picker {
+  width: 24px;
+  height: 20px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  background: none;
+  padding: 0;
+  transition: transform 0.2s ease;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  &::-webkit-color-swatch-wrapper {
+    padding: 0;
+    border: 1px solid #ced4da;
+    border-radius: 3px;
+  }
+
+  &::-webkit-color-swatch {
+    border: none;
+    border-radius: 2px;
+  }
+
+  &::-moz-color-swatch {
+    border: 1px solid #ced4da;
+    border-radius: 3px;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .top-bar {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .formula-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .cell-reference {
+    align-self: flex-start;
+    min-width: auto;
+  }
+
+  .formatting-section {
+    gap: 8px;
+  }
+
+  .control-group {
+    flex-wrap: wrap;
+  }
+}
+
+/* Focus and Accessibility */
+.format-btn:focus,
+.formula-btn:focus,
+.font-size-select:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* Smooth transitions for better UX */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}

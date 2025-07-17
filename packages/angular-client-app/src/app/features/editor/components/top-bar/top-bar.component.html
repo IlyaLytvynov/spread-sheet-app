@@ -1,0 +1,106 @@
+<div class="top-bar">
+  <!-- Formula Bar Section -->
+  <div class="formula-section">
+    <label class="cell-reference">{{ selectedCellId() }}</label>
+    <div class="formula-bar">
+      <input
+        type="text"
+        class="formula-input"
+        [(ngModel)]="formulaValue"
+        [value]="getCurrentFormula()"
+        placeholder="Enter formula (e.g., =SUM(A1:B1))"
+        (keyup.enter)="applyFormula()"
+      />
+      <button class="formula-btn apply-btn" (click)="applyFormula()" title="Apply Formula">
+        ✓
+      </button>
+      <button class="formula-btn clear-btn" (click)="clearFormula()" title="Clear Formula">
+        ✗
+      </button>
+    </div>
+  </div>
+
+  <!-- Text Formatting Section -->
+  <div class="formatting-section">
+    <!-- Font Style Controls -->
+    <div class="control-group">
+      <button
+        class="format-btn"
+        [class.active]="isBold()"
+        (click)="toggleBold()"
+        title="Bold"
+      >
+        <strong>B</strong>
+      </button>
+      <button
+        class="format-btn"
+        [class.active]="isItalic()"
+        (click)="toggleItalic()"
+        title="Italic"
+      >
+        <em>I</em>
+      </button>
+      <button
+        class="format-btn"
+        [class.active]="isUnderline()"
+        (click)="toggleUnderline()"
+        title="Underline"
+      >
+        <span style="text-decoration: underline;">U</span>
+      </button>
+    </div>
+
+    <!-- Font Size Control -->
+    <div class="control-group">
+      <select
+        class="font-size-select"
+        [value]="getCurrentFontSize()"
+        (change)="updateFontSize(+$any($event.target).value)"
+        title="Font Size"
+      >
+        <option *ngFor="let size of fontSizes" [value]="size">
+          {{ size }}px
+        </option>
+      </select>
+    </div>
+
+    <!-- Alignment Controls -->
+    <div class="control-group">
+      <button
+        *ngFor="let align of alignmentOptions"
+        class="format-btn"
+        [class.active]="getCurrentAlignment() === align.value"
+        (click)="updateAlignment(align.value)"
+        [title]="align.label"
+      >
+        {{ align.icon }}
+      </button>
+    </div>
+
+    <!-- Color Controls -->
+    <div class="control-group">
+      <div class="color-control">
+        <label for="text-color" class="color-label">A</label>
+        <input
+          id="text-color"
+          type="color"
+          class="color-picker"
+          [value]="getCurrentTextColor()"
+          (change)="updateTextColor($any($event.target).value)"
+          title="Text Color"
+        />
+      </div>
+      <div class="color-control">
+        <label for="bg-color" class="color-label bg-label">🎨</label>
+        <input
+          id="bg-color"
+          type="color"
+          class="color-picker"
+          [value]="getCurrentBackgroundColor()"
+          (change)="updateBackgroundColor($any($event.target).value)"
+          title="Background Color"
+        />
+      </div>
+    </div>
+  </div>
+</div>
