@@ -5,7 +5,10 @@
     <editor-cell
       *ngFor="let col of cols"
       [cell]="getCell(col + row)"
+      [cellId]="col + row"
+      [isActive]="isCellActive(col + row)"
       (update)="updateCell(col + row, $event)"
+      (select)="selectCell($event)"
     ></editor-cell>
   </div>
 

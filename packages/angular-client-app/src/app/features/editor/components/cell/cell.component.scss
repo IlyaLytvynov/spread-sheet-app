@@ -15,6 +15,13 @@
     &:hover {
       background: rgba(0, 0, 0, 0.2);
     }
+
+    &.active {
+      background: #007bff;
+      border: 2px solid #0056b3;
+      color: white;
+      font-weight: bold;
+    }
   }
 
   .edit {

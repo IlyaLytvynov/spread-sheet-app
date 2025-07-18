@@ -27,7 +27,10 @@ import { processStyles } from '../../utils/style-processor';
 })
 export class CellComponent implements OnDestroy {
   @Input() cell: ICell | null = null;
+  @Input() cellId: string = '';
+  @Input() isActive: boolean = false;
   @Output() update: EventEmitter<ICell> = new EventEmitter();
+  @Output() select: EventEmitter<{ cellId: string, event?: MouseEvent }> = new EventEmitter();
 
   @ViewChild('editInput') editInput?: ElementRef<HTMLInputElement>;
 
@@ -82,6 +85,10 @@ export class CellComponent implements OnDestroy {
       this.document.removeEventListener('keydown', this.keydownListener);
       this.keydownListener = undefined;
     }
+  }
+
+  onCellClick(event: MouseEvent) {
+    this.select.emit({ cellId: this.cellId, event });
   }
 
   toggleEdit() {

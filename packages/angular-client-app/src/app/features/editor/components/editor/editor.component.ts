@@ -24,6 +24,7 @@ export class EditorComponent implements OnInit {
   workbook = this.store.workbook;
   activeSheetId = computed(() => this.workbook().activeSheetId);
   activeSheet = computed(() => this.workbook().sheets[this.activeSheetId()]);
+  activeCells = this.store.activeCells;
   private platformId = inject(PLATFORM_ID);
 
   rows = ['1', '2', '3', '4', '5', ];
@@ -39,6 +40,15 @@ export class EditorComponent implements OnInit {
 
   updateCell(cellId: string, value: ICell) {
     this.store.updateCell(this.activeSheetId(), cellId, value);
+  }
+
+  selectCell(eventData: { cellId: string, event?: MouseEvent }) {
+    const multiSelect = eventData.event?.ctrlKey || eventData.event?.metaKey; // Support Ctrl/Cmd for multi-select
+    this.store.toggleActiveCell(eventData.cellId, multiSelect);
+  }
+
+  isCellActive(cellId: string): boolean {
+    return this.store.isCellActive(cellId);
   }
 
   ngOnInit() {

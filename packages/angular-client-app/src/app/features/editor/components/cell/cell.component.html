@@ -1,4 +1,4 @@
-<div class="content" [ngStyle]="cellStyles()" (dblclick)="enableEdit()">{{cell?.value}}</div>
+<div class="content" [class.active]="isActive" [ngStyle]="cellStyles()" (click)="onCellClick($event)" (dblclick)="enableEdit()">{{cell?.value}}</div>
 <div class="edit" *ngIf="edit()">
   <input
     type="text"
